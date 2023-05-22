@@ -1,0 +1,9 @@
+com\customerRegistration\controller\UserDetailsTest.class
+com\customerRegistration\controller\JWTUtilityClassTest.class
+com\customerRegistration\servicetests\CustomUserDetailsServiceTest.class
+com\customerRegistration\model\UserTest.class
+com\customerRegistration\CustomerRegistrationApplicationTests.class
+com\customerRegistration\servicetests\CustomerProfileServiceImplTest.class
+com\customerRegistration\controller\JwtAuthenticationControllerEndPointsTest.class
+com\customerRegistration\controller\JWTControllerTest.class
+com\customerRegistration\controller\CustomerProfileControllerTest.class

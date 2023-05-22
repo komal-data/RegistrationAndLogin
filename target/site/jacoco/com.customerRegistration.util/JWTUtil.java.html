@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JWTUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">customerRegistration</a> &gt; <a href="index.source.html" class="el_package">com.customerRegistration.util</a> &gt; <span class="el_source">JWTUtil.java</span></div><h1>JWTUtil.java</h1><pre class="source lang-java linenums">package com.customerRegistration.util;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+
+@Service
+<span class="fc" id="L17">public class JWTUtil {</span>
+
+	private static final long serialVersionUID = -2550185165626007488L;
+	public static final long JWT_TOKEN_VALIDITY = 1000 * 60 * 30;
+	@Value(&quot;${jwt.secret}&quot;)
+	private String secret;
+
+	public void setSecret(String key) {
+<span class="nc" id="L25">		this.secret = key;</span>
+<span class="nc" id="L26">	}</span>
+
+	// retrieve username from jwt token
+	public String getUsernameFromToken(String token) {
+<span class="fc" id="L30">		return getClaimFromToken(token, Claims::getSubject);</span>
+	}
+
+	// retrieve expiration date from jwt token
+	public Date getExpirationDateFromToken(String token) {
+<span class="fc" id="L35">		return getClaimFromToken(token, Claims::getExpiration);</span>
+	}
+
+	public &lt;T&gt; T getClaimFromToken(String token, Function&lt;Claims, T&gt; claimsResolver) {
+<span class="fc" id="L39">		final Claims claims = getAllClaimsFromToken(token);</span>
+<span class="fc" id="L40">		return claimsResolver.apply(claims);</span>
+	}
+
+	// for retrieveing any information from token we will need the secret key
+	private Claims getAllClaimsFromToken(String token) {
+<span class="fc" id="L45">		return Jwts.parser().setSigningKey(&quot;java&quot;).parseClaimsJws(token).getBody();</span>
+	}
+
+	// check if the token has expired
+	private Boolean isTokenExpired(String token) {
+<span class="fc" id="L50">		final Date expiration = getExpirationDateFromToken(token);</span>
+<span class="fc" id="L51">		return expiration.before(new Date());</span>
+	}
+
+	// generate token for user
+	public String generateToken(UserDetails userDetails) {
+<span class="fc" id="L56">		Map&lt;String, Object&gt; claims = new HashMap&lt;&gt;();</span>
+	
+<span class="fc" id="L58">		return doGenerateToken(claims, userDetails.getUsername());</span>
+	}
+
+	// while creating the token -
+	// 1. Define claims of the token, like Issuer, Expiration, Subject, and the ID
+	// 2. Sign the JWT using the HS256 algorithm
+	// 3. According to JWS Compact
+	private String doGenerateToken(Map&lt;String, Object&gt; claims, String subject) {
+<span class="fc" id="L66">		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))</span>
+<span class="fc" id="L67">				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))</span>
+<span class="fc" id="L68">				.signWith(SignatureAlgorithm.HS256, &quot;java&quot;).compact();</span>
+	}
+
+	// validate token
+	public Boolean validateToken(String token, UserDetails userDetails) {
+<span class="fc" id="L73">		final String username = getUsernameFromToken(token);</span>
+<span class="pc bpc" id="L74" title="1 of 4 branches missed.">		return (username.equals(userDetails.getUsername()) &amp;&amp; !isTokenExpired(token));</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

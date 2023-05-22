@@ -1,0 +1,14 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+customerRegistration,com.customerRegistration.model,User,0,138,0,0,0,57,0,27,0,27
+customerRegistration,com.customerRegistration.model,JWTResponse,7,9,0,0,4,4,2,2,2,2
+customerRegistration,com.customerRegistration.service,CustomerProfileServiceImpl,20,367,1,27,8,105,1,19,0,6
+customerRegistration,com.customerRegistration.service,CustomUserDetailsService,0,53,0,2,0,9,0,3,0,2
+customerRegistration,com.customerRegistration.util,JWTUtil,4,93,1,3,2,15,2,10,1,9
+customerRegistration,com.customerRegistration.filter,JWTAuthenticationFilter,49,18,7,1,14,7,4,2,0,2
+customerRegistration,com.customerRegistration.controller,JWTController,27,95,1,1,5,18,1,3,0,3
+customerRegistration,com.customerRegistration.controller,CustomerProfileController,0,10,0,0,0,3,0,2,0,2
+customerRegistration,com.customerRegistration.dto,CustomerProfileDTO,0,80,0,0,0,34,0,23,0,23
+customerRegistration,com.customerRegistration.dto,SuccessResponse,0,10,0,0,0,4,0,3,0,3
+customerRegistration,com.customerRegistration.dto,ErrorResponse,0,17,0,0,0,7,0,5,0,5
+customerRegistration,com.customerRegistration.config,SpringSecurityConfiguration,0,112,0,0,0,15,0,6,0,6
+customerRegistration,com.customerRegistration,CustomerRegistrationApplication,0,8,0,0,0,3,0,2,0,2

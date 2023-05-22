@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CustomerProfileServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">customerRegistration</a> &gt; <a href="index.source.html" class="el_package">com.customerRegistration.service</a> &gt; <span class="el_source">CustomerProfileServiceImpl.java</span></div><h1>CustomerProfileServiceImpl.java</h1><pre class="source lang-java linenums">package com.customerRegistration.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
+import com.customerRegistration.dto.CustomerProfileDTO;
+import com.customerRegistration.dto.ErrorResponse;
+import com.customerRegistration.dto.SuccessResponse;
+import com.customerRegistration.model.User;
+import com.customerRegistration.repository.CustomerProfileRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+@Component
+<span class="fc" id="L23">public class CustomerProfileServiceImpl {</span>
+
+	@Autowired
+	CustomerProfileRepository customerProfileRepository;
+	
+
+	public String createCustomerProfile(CustomerProfileDTO customerProfileDTO) {
+
+<span class="fc" id="L31">		String response = null;</span>
+
+<span class="fc" id="L33">		List&lt;ErrorResponse&gt; listErrorResponse = validateCustomerProfile(customerProfileDTO);</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">		if (!CollectionUtils.isEmpty(listErrorResponse)) {</span>
+<span class="fc" id="L35">			response = prepareErrorResponse(listErrorResponse);</span>
+<span class="fc" id="L36">			return response;</span>
+		}
+
+<span class="fc" id="L39">		User customerProfile = transformIntoCustomerEntity(customerProfileDTO);</span>
+<span class="fc" id="L40">		customerProfileRepository.save(customerProfile);</span>
+
+<span class="fc" id="L42">		return prepareSuccessResponse();</span>
+
+	}
+
+	private User transformIntoCustomerEntity(CustomerProfileDTO customerProfileDTO) {
+
+<span class="fc" id="L48">		User customerProfile = new User();</span>
+<span class="fc" id="L49">		customerProfile.setName(customerProfileDTO.getName());</span>
+<span class="fc" id="L50">		customerProfile.setUsername(customerProfileDTO.getUsername());</span>
+<span class="fc" id="L51">		customerProfile.setAccountType(customerProfileDTO.getAccountType());</span>
+<span class="fc" id="L52">		customerProfile.setAddress(customerProfileDTO.getAddress());</span>
+<span class="fc" id="L53">		customerProfile.setCountry(customerProfileDTO.getCountry());</span>
+<span class="fc" id="L54">		customerProfile.setDateOfBirth(customerProfileDTO.getDateOfBirth());</span>
+<span class="fc" id="L55">		customerProfile.setEmailAddress(customerProfileDTO.getEmailAddress());</span>
+<span class="fc" id="L56">		customerProfile.setPan(customerProfileDTO.getPan());</span>
+<span class="fc" id="L57">		customerProfile.setPassword(customerProfileDTO.getPassword());</span>
+<span class="fc" id="L58">		customerProfile.setState(customerProfileDTO.getState());</span>
+<span class="fc" id="L59">		customerProfile.setMobileNo(customerProfileDTO.getMobileNo());</span>
+
+<span class="fc" id="L61">		return customerProfile;</span>
+	}
+
+	private String prepareSuccessResponse() {
+<span class="fc" id="L65">		SuccessResponse successResponse = new SuccessResponse();</span>
+<span class="fc" id="L66">		successResponse.setMessage(&quot;Your registration has been successfully completed&quot;);</span>
+<span class="fc" id="L67">		ObjectMapper objectMapper = new ObjectMapper();</span>
+<span class="fc" id="L68">		String response = null;</span>
+		try {
+<span class="fc" id="L70">			response = objectMapper.writeValueAsString(successResponse);</span>
+<span class="nc" id="L71">		} catch (JsonProcessingException e) {</span>
+			// TODO Auto-generated catch block
+<span class="nc" id="L73">			e.printStackTrace();</span>
+<span class="fc" id="L74">		}</span>
+
+<span class="fc" id="L76">		return response;</span>
+	}
+
+	private String prepareErrorResponse(List&lt;ErrorResponse&gt; listErrorResponse) {
+<span class="fc" id="L80">		ObjectMapper objectMapper = new ObjectMapper();</span>
+<span class="fc" id="L81">		String response = null;</span>
+		try {
+<span class="fc" id="L83">			response = objectMapper.writeValueAsString(listErrorResponse);</span>
+<span class="nc" id="L84">		} catch (JsonProcessingException e) {</span>
+			// TODO Auto-generated catch block
+<span class="nc" id="L86">			e.printStackTrace();</span>
+<span class="fc" id="L87">		}</span>
+
+<span class="fc" id="L89">		return response;</span>
+	}
+
+	private List&lt;ErrorResponse&gt; validateCustomerProfile(CustomerProfileDTO customerProfileDTO) {
+
+<span class="fc" id="L94">		List&lt;ErrorResponse&gt; listErrorResponse = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L96" title="All 2 branches covered.">		if (StringUtils.isEmpty(customerProfileDTO.getName())) {</span>
+<span class="fc" id="L97">			ErrorResponse errorResponse = new ErrorResponse();</span>
+<span class="fc" id="L98">			errorResponse.setName(&quot;Name&quot;);</span>
+<span class="fc" id="L99">			errorResponse.setDetail(&quot;Name is mandatory or missing&quot;);</span>
+<span class="fc" id="L100">			listErrorResponse.add(errorResponse);</span>
+		}
+<span class="fc bfc" id="L102" title="All 2 branches covered.">		if (StringUtils.isEmpty(customerProfileDTO.getUsername())) {</span>
+<span class="fc" id="L103">			ErrorResponse errorResponse = new ErrorResponse();</span>
+<span class="fc" id="L104">			errorResponse.setName(&quot;Username&quot;);</span>
+<span class="fc" id="L105">			errorResponse.setDetail(&quot;Username is mandatory or missing&quot;);</span>
+<span class="fc" id="L106">			listErrorResponse.add(errorResponse);</span>
+		}
+<span class="fc" id="L108">		String regex = &quot;^(?=.*[0-9])&quot; + &quot;(?=.*[a-z])(?=.*[A-Z])&quot; + &quot;(?=.*[@#$%^&amp;+=])&quot; + &quot;(?=\\S+$).{6,10}$&quot;;</span>
+
+<span class="fc" id="L110">		Pattern p = Pattern.compile(regex);</span>
+
+<span class="fc" id="L112">		Matcher m = p.matcher(customerProfileDTO.getPassword());</span>
+
+<span class="fc bfc" id="L114" title="All 2 branches covered.">		if (!m.matches()) {</span>
+<span class="fc" id="L115">			ErrorResponse errorResponse = new ErrorResponse();</span>
+<span class="fc" id="L116">			errorResponse.setName(&quot;password&quot;);</span>
+<span class="fc" id="L117">			errorResponse.setDetail(</span>
+					&quot;Password should contain atleast 6 characters, uppercase, lowercase, special characters and numbers&quot;);
+
+<span class="fc" id="L120">			listErrorResponse.add(errorResponse);</span>
+		}
+
+<span class="fc bfc" id="L123" title="All 2 branches covered.">		if ((customerProfileDTO.getAddress()).length() &gt; 50) {</span>
+<span class="fc" id="L124">			ErrorResponse errorResponse = new ErrorResponse();</span>
+<span class="fc" id="L125">			errorResponse.setName(&quot;address&quot;);</span>
+<span class="fc" id="L126">			errorResponse.setDetail(&quot;Address should be less than 50 characters&quot;);</span>
+
+<span class="fc" id="L128">			listErrorResponse.add(errorResponse);</span>
+		}
+
+<span class="fc bfc" id="L131" title="All 2 branches covered.">		if (StringUtils.isEmpty(customerProfileDTO.getState())) {</span>
+
+<span class="fc" id="L133">			ErrorResponse errorResponse = new ErrorResponse();</span>
+<span class="fc" id="L134">			errorResponse.setName(&quot;state&quot;);</span>
+<span class="fc" id="L135">			errorResponse.setDetail(&quot;State field is Mandatory&quot;);</span>
+
+<span class="fc" id="L137">			listErrorResponse.add(errorResponse);</span>
+		}
+
+<span class="fc bfc" id="L140" title="All 2 branches covered.">		if (StringUtils.isEmpty(customerProfileDTO.getCountry())) {</span>
+<span class="fc" id="L141">			ErrorResponse errorResponse = new ErrorResponse();</span>
+<span class="fc" id="L142">			errorResponse.setName(&quot;country&quot;);</span>
+<span class="fc" id="L143">			errorResponse.setDetail(&quot;Country field is Mandatory&quot;);</span>
+
+<span class="fc" id="L145">			listErrorResponse.add(errorResponse);</span>
+		}
+
+<span class="fc" id="L148">		String regex1 = &quot;^(.+)@(.+).(.+)$&quot;;</span>
+
+<span class="fc" id="L150">		Pattern p1 = Pattern.compile(regex1);</span>
+
+<span class="fc" id="L152">		Matcher m1 = p1.matcher(customerProfileDTO.getEmailAddress());</span>
+
+<span class="fc bfc" id="L154" title="All 2 branches covered.">		if (!m1.matches()) {</span>
+<span class="fc" id="L155">			ErrorResponse errorResponse = new ErrorResponse();</span>
+<span class="fc" id="L156">			errorResponse.setName(&quot;Email&quot;);</span>
+<span class="fc" id="L157">			errorResponse.setDetail(&quot;Enter a Vaild Email Address&quot;);</span>
+
+<span class="fc" id="L159">			listErrorResponse.add(errorResponse);</span>
+		}
+
+<span class="fc" id="L162">		String regex2 = &quot;[A-Z]{5}[0-9]{4}[A-Z]{1}&quot;;</span>
+
+<span class="fc" id="L164">		Pattern p2 = Pattern.compile(regex2);</span>
+
+<span class="fc" id="L166">		Matcher m2 = p2.matcher(customerProfileDTO.getPan());</span>
+
+<span class="fc bfc" id="L168" title="All 2 branches covered.">		if (!m2.matches()) {</span>
+<span class="fc" id="L169">			ErrorResponse errorResponse = new ErrorResponse();</span>
+<span class="fc" id="L170">			errorResponse.setName(&quot;Pan&quot;);</span>
+<span class="fc" id="L171">			errorResponse.setDetail(&quot;Enter a Vaild PAN Number&quot;);</span>
+
+<span class="fc" id="L173">			listErrorResponse.add(errorResponse);</span>
+
+		}
+
+<span class="fc bfc" id="L177" title="All 2 branches covered.">		if (!&quot;SAVING&quot;.equals(customerProfileDTO.getAccountType())</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">				&amp;&amp; !&quot;SALARY&quot;.equals(customerProfileDTO.getAccountType())) {</span>
+<span class="fc" id="L179">			ErrorResponse errorResponse = new ErrorResponse();</span>
+<span class="fc" id="L180">			errorResponse.setName(&quot;AccountType&quot;);</span>
+<span class="fc" id="L181">			errorResponse.setDetail(&quot;Account Type should be Salary or Savings&quot;);</span>
+
+<span class="fc" id="L183">			listErrorResponse.add(errorResponse);</span>
+		}
+
+<span class="fc" id="L186">		Pattern p3 = Pattern.compile(&quot;[7-9][0-9]{9}&quot;);</span>
+
+<span class="fc" id="L188">		Matcher m3 = p3.matcher(customerProfileDTO.getMobileNo());</span>
+
+<span class="fc bfc" id="L190" title="All 2 branches covered.">		if (!m3.matches()) {</span>
+<span class="fc" id="L191">			ErrorResponse errorResponse = new ErrorResponse();</span>
+<span class="fc" id="L192">			errorResponse.setName(&quot;MobileNumber&quot;);</span>
+<span class="fc" id="L193">			errorResponse.setDetail(&quot;Mobile number should have 10 digits&quot;);</span>
+
+<span class="fc" id="L195">			listErrorResponse.add(errorResponse);</span>
+		}
+
+<span class="fc bfc" id="L198" title="All 2 branches covered.">		if (StringUtils.isEmpty(customerProfileDTO.getDateOfBirth())) {</span>
+<span class="fc" id="L199">			ErrorResponse errorResponse = new ErrorResponse();</span>
+<span class="fc" id="L200">			errorResponse.setName(&quot;DOB&quot;);</span>
+<span class="fc" id="L201">			errorResponse.setDetail(&quot;DOB is incorrect or missing&quot;);</span>
+
+<span class="fc" id="L203">			listErrorResponse.add(errorResponse);</span>
+		}
+		
+<span class="fc" id="L206">		Optional&lt;User&gt; userOpt= customerProfileRepository.findByUsername(customerProfileDTO.getUsername());</span>
+<span class="pc bpc" id="L207" title="1 of 2 branches missed.">		if(userOpt.isPresent()) {</span>
+<span class="nc" id="L208">			ErrorResponse errorResponse = new ErrorResponse();</span>
+<span class="nc" id="L209">			errorResponse.setName(&quot;UserName&quot;);</span>
+<span class="nc" id="L210">			errorResponse.setDetail(&quot;UserName is already present&quot;);</span>
+			
+<span class="nc" id="L212">			listErrorResponse.add(errorResponse);</span>
+		}
+
+<span class="fc" id="L215">		return listErrorResponse;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
